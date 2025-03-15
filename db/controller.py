@@ -55,14 +55,19 @@ class DatabaseSessionManager:
         if self._sessionmaker is None:
             raise Exception("DatabaseSessionManager is not initialized")
 
-        session = self._sessionmaker()
+        session = self._sessionmaker(
+            #class_=AsyncSession
+            #expire_on_commit=False
+            )
         try:
             yield session
         except Exception:
             await session.rollback()
+            await session.close()
             raise
         finally:
-            await session.close()
+            pass
+            #await session.close()
 
 #asyncio.create_task(check_init_models())
 
