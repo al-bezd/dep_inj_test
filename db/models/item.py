@@ -35,8 +35,10 @@ class Item(Base):
         return None
 
     async def out(self):
+        attrs = {
+            'id': await self.awaitable_attrs.id, 'name': await self.awaitable_attrs.name, 'description': await self.awaitable_attrs.description,
+        }
+
         return ItemView(
-            id=await self.awaitable_attrs.id, 
-            name=await self.awaitable_attrs.name, 
-            description=await self.awaitable_attrs.description
+            **attrs
         )

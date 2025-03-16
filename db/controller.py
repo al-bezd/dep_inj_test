@@ -1,4 +1,5 @@
 import contextlib
+from fastapi import Depends
 from sqlalchemy.orm import sessionmaker
 import contextlib
 import asyncio
@@ -55,19 +56,14 @@ class DatabaseSessionManager:
         if self._sessionmaker is None:
             raise Exception("DatabaseSessionManager is not initialized")
 
-        session = self._sessionmaker(
-            #class_=AsyncSession
-            #expire_on_commit=False
-            )
+        session = self._sessionmaker()
         try:
             yield session
         except Exception:
             await session.rollback()
-            await session.close()
             raise
         finally:
-            pass
-            #await session.close()
+            await session.close()
 
 #asyncio.create_task(check_init_models())
 
@@ -78,4 +74,4 @@ async def get_db_session():
     async with sessionmanager.session() as session:
         yield session
 
-#DBSessionDep = Annotated[AsyncSession, Depends(get_db_session)]
+DBSessionDep = Annotated[AsyncSession, Depends(get_db_session)]
